@@ -3,6 +3,7 @@ from pathlib import Path
 import time
 import paramiko
 from datetime import datetime
+from io import StringIO
 
 print("Enter your aws_user_id:")
 id = input()
@@ -12,19 +13,6 @@ print("Enter your aws_region:")
 aws_region = input()
 home = str(Path.home())
 
-# Creation of user configures
-"""
-credentialsFile = open(home+"/.aws/credentials", "wt")
-credentialsFile.write("[default]"+"\n")
-credentialsFile.write("aws_access_key_id = "+id+"\n")
-credentialsFile.write("aws_secret_access_key = "+password+"\n")
-credentialsFile.close()
-
-configFile = open(home+"/.aws/config", "wt")
-configFile.write("[default]"+"\n")
-configFile.write("region="+region+"\n")
-configFile.close()
-"""
 #Creation of EC2 instance
 print("Enter KeyName for new instance:")
 keyName = input()
@@ -68,10 +56,9 @@ instances[0].wait_until_running()
 instances[0].attach_volume(VolumeId=volume.id, Device='/dev/xvdf')
 
 #connect via ssh
-print("Enter full path to the ssh file:")
-sshFilePath = input()
+print(ssh_key['KeyMaterial'])
 #key = paramiko.RSAKey.from_private_key_file(sshFilePath)
-key=ssh_key
+key = paramiko.RSAKey.from_private_key(StringIO(ssh_key['KeyMaterial']))
 sshClient = paramiko.SSHClient()
 sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 try:

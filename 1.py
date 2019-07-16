@@ -57,8 +57,11 @@ instances[0].attach_volume(VolumeId=volume.id, Device='/dev/xvdf')
 
 #connect via ssh
 print(ssh_key['KeyMaterial'])
-#key = paramiko.RSAKey.from_private_key_file(sshFilePath)
-key = paramiko.RSAKey.from_private_key(StringIO(ssh_key['KeyMaterial']))
+sshFile = open(home+"/sshKey.pom", "wt")
+sshFile.write(str(ssh_key['KeyMaterial']))
+sshFile.close()
+key = paramiko.RSAKey.from_private_key_file(home+"/sshKey.pom")
+#key = paramiko.RSAKey(StringIO(ssh_key['KeyMaterial']))
 sshClient = paramiko.SSHClient()
 sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 try:

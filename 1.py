@@ -4,6 +4,7 @@ import time
 import paramiko
 from datetime import datetime
 from io import StringIO
+import os
 
 print("Enter your aws_user_id:")
 id = input()
@@ -61,7 +62,6 @@ sshFile = open(home+"/sshKey.pom", "wt")
 sshFile.write(str(ssh_key['KeyMaterial']))
 sshFile.close()
 key = paramiko.RSAKey.from_private_key_file(home+"/sshKey.pom")
-#key = paramiko.RSAKey(StringIO(ssh_key['KeyMaterial']))
 sshClient = paramiko.SSHClient()
 sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 try:
@@ -73,3 +73,6 @@ try:
     sshClient.close()
 except Exception:
     print("SSH exception happened")
+
+client.delete_key_pair(KeyName=keyName)
+os.remove(home+"/sshKey.pom")

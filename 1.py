@@ -52,7 +52,7 @@ for response in responses['Reservations']:
           if(instance['InstanceId']==instances[0].id):
               availability_zone = instance['Placement']['AvailabilityZone']
 volume = ec2.create_volume(AvailabilityZone=availability_zone,VolumeType='standard', Size=1)
-print("The instance is startig. Please wait ...")
+print("The instance is starting. Please wait ...")
 instances[0].wait_until_running()
 instances[0].attach_volume(VolumeId=volume.id, Device='/dev/xvdf')
 
@@ -61,18 +61,16 @@ print(ssh_key['KeyMaterial'])
 sshFile = open(home+"/sshKey.pom", "wt")
 sshFile.write(str(ssh_key['KeyMaterial']))
 sshFile.close()
+
 key = paramiko.RSAKey.from_private_key_file(home+"/sshKey.pom")
+#key=paramiko.RSAKey(file_obj=StringIO(ssh_key['KeyMaterial']))
+print("ok")
 sshClient = paramiko.SSHClient()
 sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-try:
-    print(instances[0].public_dns_name)
-    sshClient.connect(hostname=instances[0].public_dns_name, username="ubuntu", pkey=key)
-    stdin, stdout, stderr = sshClient.exec_command('sudo mkfs.ext4 /dev/xvdf')
-    stdin, stdout, stderr = sshClient.exec_command('sudo mkdir /mnt/xvdf')
-    stdin, stdout, stderr = sshClient.exec_command('sudo mount /dev/xvdf /mnt/xvdf')
-    sshClient.close()
-except Exception:
-    print("SSH exception happened")
-
-client.delete_key_pair(KeyName=keyName)
+print(instances[0].public_dns_name)
+sshClient.connect(hostname=instances[0].public_dns_name, username="ubuntu", pkey=key)
+stdin, stdout, stderr = sshClient.exec_command('sudo mkfs.ext4 /dev/xvdf')
+stdin, stdout, stderr = sshClient.exec_command('sudo mkdir /mnt/xvdf')
+stdin, stdout, stderr = sshClient.exec_command('sudo mount /dev/xvdf /mnt/xvdf')
+sshClient.close()
 os.remove(home+"/sshKey.pom")

@@ -1,9 +1,7 @@
 import boto3
 from pathlib import Path
-import time
 import paramiko
 from datetime import datetime
-from io import StringIO
 import os
 
 print("Enter your aws_user_id:")
@@ -15,7 +13,7 @@ aws_region = input()
 home = str(Path.home())
 
 #Creation of EC2 instance
-print("Enter KeyName for new instance:")
+print("Enter KeyName for a  new instance:")
 keyName = input()
 ec2 = boto3.resource('ec2', aws_access_key_id=id, aws_secret_access_key=password, region_name=aws_region)
 client = boto3.client('ec2', region_name=aws_region)
@@ -56,18 +54,15 @@ print("The instance is starting. Please wait ...")
 instances[0].wait_until_running()
 instances[0].attach_volume(VolumeId=volume.id, Device='/dev/xvdf')
 
-#connect via ssh
-print(ssh_key['KeyMaterial'])
+#Connection via ssh
+print("Connecting to the instance via SSH")
 sshFile = open(home+"/sshKey.pom", "wt")
 sshFile.write(str(ssh_key['KeyMaterial']))
 sshFile.close()
 
 key = paramiko.RSAKey.from_private_key_file(home+"/sshKey.pom")
-#key=paramiko.RSAKey(file_obj=StringIO(ssh_key['KeyMaterial']))
-print("ok")
 sshClient = paramiko.SSHClient()
 sshClient.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-print(instances[0].public_dns_name)
 sshClient.connect(hostname=instances[0].public_dns_name, username="ubuntu", pkey=key)
 stdin, stdout, stderr = sshClient.exec_command('sudo mkfs.ext4 /dev/xvdf')
 stdin, stdout, stderr = sshClient.exec_command('sudo mkdir /mnt/xvdf')

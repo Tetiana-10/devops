@@ -4,16 +4,16 @@ import paramiko
 from datetime import datetime
 import os
 
-print("Enter your aws_user_id:")
+print("Enter your AWS access key ID:")
 id = input()
-print("Enter your aws_user_password:")
+print("Enter your AWS secret access key:")
 password = input()
-print("Enter your aws_region:")
+print("Enter your AWS region:")
 aws_region = input()
 home = str(Path.home())
 
 #Creation of EC2 instance
-print("Enter KeyName for a  new instance:")
+print("Enter KeyName for a new instance:")
 keyName = input()
 ec2 = boto3.resource('ec2', aws_access_key_id=id, aws_secret_access_key=password, region_name=aws_region)
 client = boto3.client('ec2', region_name=aws_region)
@@ -40,7 +40,7 @@ securityGroup.authorize_ingress(
          'ToPort': 22,
          'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
     ]
-) 
+)
 instances[0].modify_attribute(Groups=[securityGroup.group_id])
 
 #Creation of EBS volume
@@ -69,3 +69,4 @@ stdin, stdout, stderr = sshClient.exec_command('sudo mkdir /mnt/xvdf')
 stdin, stdout, stderr = sshClient.exec_command('sudo mount /dev/xvdf /mnt/xvdf')
 sshClient.close()
 os.remove(home+"/sshKey.pom")
+print("The script was executed successfully!")
